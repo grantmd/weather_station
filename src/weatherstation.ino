@@ -59,7 +59,7 @@ void loop() {
 
 void publishToParticle(float tempF,float humidityRH,float pressureKPa,float rainInches,float windMPH,float gustMPH,float windDegrees) {
     Particle.publish("weather", 
-                        String::format("%0.1f�F, %0.0f%%, %0.2f kPa, %0.2f in, Avg:%0.0fmph, Gust:%0.0fmph, Dir:%0.0f�.",
+                        String::format("%0.1f°F, %0.0f%%, %0.2f kPa, %0.2f in, Avg:%0.0fmph, Gust:%0.0fmph, Dir:%0.0f°.",
                             tempF,humidityRH,pressureKPa,rainInches,windMPH,gustMPH,windDegrees),
                         60 , PRIVATE);    
 }
