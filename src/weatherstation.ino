@@ -1,20 +1,8 @@
-// Include libraries for talking to ThingSpeak and the weather shield
-#include "ThingSpeak.h"
+// Include library for talking to the weather shield
 #include "SparkFun_Photon_Weather_Shield_Library.h"
 
 // Add math to get sine and cosine for wind vane
 #include <math.h>
-
-/*
-  *****************************************************************************************
-  **** Visit https://www.thingspeak.com to sign up for a free account and create
-  **** a channel.  The video tutorial http://community.thingspeak.com/tutorials/thingspeak-channels/ 
-  **** has more information. You need to change this to your channel, and your write API key
-  **** IF YOU SHARE YOUR CODE WITH OTHERS, MAKE SURE YOU REMOVE YOUR WRITE API KEY!!
-  **** To learn more about ThingSpeak, see the introductory video: http://www.mathworks.com/videos/introduction-to-thingspeak-107749.html
-  *****************************************************************************************/
-unsigned long thingspeakChannelNumber = 583596;
-char thingSpeakWriteAPIKey[] = "GVTOW014TE7BFJL0";
 
 // Each time we loop through the main loop, we check to see if it's time to capture the sensor readings
 unsigned int sensorCapturePeriod = 100;
@@ -25,7 +13,6 @@ unsigned int publishPeriod = 60000;
 unsigned int timeNextPublish; 
 
 void setup() {
-    initializeThingSpeak();
     initializeTempHumidityAndPressure();
     initializeRainGauge();
     initializeAnemometer();
@@ -48,7 +35,7 @@ void loop() {
         timeNextSensorReading = millis() + sensorCapturePeriod;
     }
     
-    // Publish the data collected to Particle and to ThingSpeak
+    // Publish the data collected to Particle
     if(timeNextPublish <= millis()) {
         
         // Get the data to be published
@@ -62,7 +49,6 @@ void loop() {
                           
         // Publish the data                    
         publishToParticle(tempF,humidityRH,pressureKPa,rainInches,windMPH,gustMPH,windDegrees);
-        publishToThingSpeak(tempF,humidityRH,pressureKPa,rainInches,windMPH,gustMPH,windDegrees);
 
         // Schedule the next publish event
         timeNextPublish = millis() + publishPeriod;
@@ -76,29 +62,6 @@ void publishToParticle(float tempF,float humidityRH,float pressureKPa,float rain
                         String::format("%0.1f�F, %0.0f%%, %0.2f kPa, %0.2f in, Avg:%0.0fmph, Gust:%0.0fmph, Dir:%0.0f�.",
                             tempF,humidityRH,pressureKPa,rainInches,windMPH,gustMPH,windDegrees),
                         60 , PRIVATE);    
-}
-
-//===========================================================
-// ThingSpeak
-//===========================================================
-TCPClient client;
-
-void initializeThingSpeak() {
-    ThingSpeak.begin(client);
-}
-
-void publishToThingSpeak(float tempF,float humidityRH,float pressureKPa,float rainInches,float windMPH,float gustMPH,float windDegrees) {
-    // To write multiple fields, you set the various fields you want to send
-    ThingSpeak.setField(1,tempF);
-    ThingSpeak.setField(2,humidityRH);
-    ThingSpeak.setField(3,pressureKPa);
-    ThingSpeak.setField(4,rainInches);
-    ThingSpeak.setField(5,windMPH);
-    ThingSpeak.setField(6,gustMPH);
-    ThingSpeak.setField(7,windDegrees);
-    
-    // Then you write the fields that you've set all at once.
-    ThingSpeak.writeFields(thingspeakChannelNumber, thingSpeakWriteAPIKey);
 }
 
 //===========================================================
