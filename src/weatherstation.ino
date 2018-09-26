@@ -1,6 +1,9 @@
 // Include library for talking to the weather shield
 #include "SparkFun_Photon_Weather_Shield_Library.h"
 
+// Include library for talking to the power shield
+#include "PowerShield.h"
+
 // Add math to get sine and cosine for wind vane
 #include <math.h>
 
