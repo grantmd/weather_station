@@ -16,6 +16,7 @@ unsigned int publishPeriod = 60000;
 unsigned int timeNextPublish; 
 
 void setup() {
+    initializeBatteryMonitor();
     initializeTempHumidityAndPressure();
     initializeRainGauge();
     initializeAnemometer();
@@ -42,6 +43,7 @@ void loop() {
     if(timeNextPublish <= millis()) {
         
         // Get the data to be published
+        float stateOfCharge = getBatteryMonitorStateOfCharge();
         float tempF = getAndResetTempF();
         float humidityRH = getAndResetHumidityRH();
         float pressureKPa = getAndResetPressurePascals() / 1000.0;
@@ -51,7 +53,7 @@ void loop() {
         float windDegrees = getAndResetWindVaneDegrees();
                           
         // Publish the data                    
-        publishToParticle(tempF,humidityRH,pressureKPa,rainInches,windMPH,gustMPH,windDegrees);
+        publishToParticle(tempF, humidityRH, pressureKPa, rainInches, windMPH, gustMPH, windDegrees, stateOfCharge);
 
         // Schedule the next publish event
         timeNextPublish = millis() + publishPeriod;
@@ -60,11 +62,30 @@ void loop() {
     delay(10);
 }
 
-void publishToParticle(float tempF,float humidityRH,float pressureKPa,float rainInches,float windMPH,float gustMPH,float windDegrees) {
+void publishToParticle(float tempF, float humidityRH, float pressureKPa, float rainInches, float windMPH, float gustMPH, float windDegrees, float stateOfCharge) {
     Particle.publish("weather", 
-                        String::format("%0.1f°F, %0.0f%%, %0.2f kPa, %0.2f in, Avg:%0.0fmph, Gust:%0.0fmph, Dir:%0.0f°.",
-                            tempF,humidityRH,pressureKPa,rainInches,windMPH,gustMPH,windDegrees),
+                        String::format("%0.1f°F, %0.0f%%, %0.2f kPa, %0.2f in, Avg: %0.0fmph, Gust: %0.0fmph, Dir: %0.0f°, Battery: %0.0f%%.",
+                            tempF, humidityRH, pressureKPa, rainInches, windMPH, gustMPH, windDegrees, stateOfCharge),
                         60 , PRIVATE);    
+}
+
+// Battery monitoring
+PowerShield batteryMonitor;
+void initializeBatteryMonitor() {
+    batteryMonitor.begin(); 
+    batteryMonitor.quickStart();
+
+    return;
+}
+
+float getBatteryMonitorVoltage() {
+    float cellVoltage = batteryMonitor.getVCell();
+    return cellVoltage;
+}
+
+float getBatteryMonitorStateOfCharge() {
+    float stateOfCharge = batteryMonitor.getSoC();
+    return stateOfCharge;
 }
 
 //===========================================================
