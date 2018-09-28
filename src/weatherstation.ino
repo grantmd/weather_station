@@ -66,7 +66,7 @@ void publishToParticle(float tempF, float humidityRH, float pressureKPa, float r
     Particle.publish("weather", 
                         String::format("%0.1f°F, %0.0f%%, %0.2f kPa, %0.2f in, Avg: %0.0fmph, Gust: %0.0fmph, Dir: %0.0f°, Battery: %0.0f%%.",
                             tempF, humidityRH, pressureKPa, rainInches, windMPH, gustMPH, windDegrees, stateOfCharge),
-                        60 , PRIVATE);    
+                        60);    
 }
 
 // Battery monitoring
