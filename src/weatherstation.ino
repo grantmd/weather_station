@@ -8,11 +8,11 @@
 #include <math.h>
 
 // Each time we loop through the main loop, we check to see if it's time to capture the sensor readings
-unsigned int sensorCapturePeriod = 100;
+unsigned int sensorCapturePeriod = 100; // milliseconds - poll every 100ms
 unsigned int timeNextSensorReading;
 
 // Each time we loop through the main loop, we check to see if it's time to publish the data we've collected
-unsigned int publishPeriod = 60000;
+unsigned int publishPeriod = 60000 * 15; // milliseconds - report every 15 seconds
 unsigned int timeNextPublish; 
 
 void setup() {
