@@ -13,7 +13,10 @@ unsigned int timeNextSensorReading;
 
 // Each time we loop through the main loop, we check to see if it's time to publish the data we've collected
 unsigned int publishPeriod = 60000 * 15; // milliseconds - report every 15 seconds
-unsigned int timeNextPublish; 
+unsigned int timeNextPublish = 0;
+
+// Set system mode so we can control power consumption and network activity
+//SYSTEM_MODE(SEMI_AUTOMATIC);
 
 void setup() {
     initializeBatteryMonitor();
@@ -21,10 +24,12 @@ void setup() {
     initializeRainGauge();
     initializeAnemometer();
     initializeWindVane();
+
+    // TODO: Register events on wake/sleep/network etc?
     
     // Schedule the next sensor reading and publish events
     timeNextSensorReading = millis() + sensorCapturePeriod;
-    timeNextPublish = millis() + publishPeriod; 
+    timeNextPublish = millis() + sensorCapturePeriod; // First publish should be immediately after first read
 }
 
 void loop() {
@@ -52,11 +57,17 @@ void loop() {
         float windMPH = getAndResetAnemometerMPH(&gustMPH);
         float windDegrees = getAndResetWindVaneDegrees();
                           
-        // Publish the data                    
+        // Publish the data
+        //WiFi.on();
+        //WiFi.connect();
+        //Particle.connect();
         publishToParticle(tempF, humidityRH, pressureKPa, rainInches, windMPH, gustMPH, windDegrees, stateOfCharge);
+        //Particle.disconnect();
+        //WiFi.off();
 
         // Schedule the next publish event
         timeNextPublish = millis() + publishPeriod;
+        System.sleep((publishPeriod / 1000) - 5); // Put wifi to sleep until the next publish period, to save battery
     }
     
     delay(10);
