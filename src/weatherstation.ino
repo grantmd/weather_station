@@ -19,6 +19,8 @@ unsigned int timeNextPublish = 0;
 //SYSTEM_MODE(SEMI_AUTOMATIC);
 
 void setup() {
+    Serial.begin();
+
     initializeBatteryMonitor();
     initializeTempHumidityAndPressure();
     initializeRainGauge();
@@ -37,8 +39,10 @@ void loop() {
     // Capture any sensors that need to be polled (temp, humidity, pressure, wind vane)
     // The rain and wind speed sensors use interrupts, and so data is collected "in the background"
     if(timeNextSensorReading <= millis()) {
+        //Serial.write("Taking sensor readings...\n");
         captureTempHumidityPressure();
         captureWindVane();
+        //Serial.write("Sensor reading complete.\n");
 
         // Schedule the next sensor reading
         timeNextSensorReading = millis() + sensorCapturePeriod;
@@ -47,6 +51,7 @@ void loop() {
     // Publish the data collected to Particle
     if(timeNextPublish <= millis()) {
         
+        Serial.write("Getting data to publish...\n");
         // Get the data to be published
         float stateOfCharge = getBatteryMonitorStateOfCharge();
         float tempF = getAndResetTempF();
@@ -58,12 +63,15 @@ void loop() {
         float windDegrees = getAndResetWindVaneDegrees();
                           
         // Publish the data
+        Serial.write("Data collection complete. Publishing...\n");
         //WiFi.on();
         //WiFi.connect();
         //Particle.connect();
         publishToParticle(tempF, humidityRH, pressureKPa, rainInches, windMPH, gustMPH, windDegrees, stateOfCharge);
+        publishToSerial(tempF, humidityRH, pressureKPa, rainInches, windMPH, gustMPH, windDegrees, stateOfCharge);
         //Particle.disconnect();
         //WiFi.off();
+        Serial.write("Publishing complete.\n");
 
         // Schedule the next publish event
         timeNextPublish = millis() + publishPeriod;
@@ -78,6 +86,11 @@ void publishToParticle(float tempF, float humidityRH, float pressureKPa, float r
                         String::format("%0.1f°F, %0.0f%%, %0.2f kPa, %0.2f in, Avg: %0.0fmph, Gust: %0.0fmph, Dir: %0.0f°, Battery: %0.0f%%.",
                             tempF, humidityRH, pressureKPa, rainInches, windMPH, gustMPH, windDegrees, stateOfCharge),
                         60);    
+}
+
+void publishToSerial(float tempF, float humidityRH, float pressureKPa, float rainInches, float windMPH, float gustMPH, float windDegrees, float stateOfCharge) {
+    Serial.write(String::format("%0.1f°F, %0.0f%%, %0.2f kPa, %0.2f in, Avg: %0.0fmph, Gust: %0.0fmph, Dir: %0.0f°, Battery: %0.0f%%.\n",
+                            tempF, humidityRH, pressureKPa, rainInches, windMPH, gustMPH, windDegrees, stateOfCharge));    
 }
 
 // Battery monitoring
