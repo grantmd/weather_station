@@ -75,7 +75,7 @@ void loop() {
 
         // Schedule the next publish event
         timeNextPublish = millis() + publishPeriod;
-        System.sleep((publishPeriod / 1000) - 5); // Put wifi to sleep until the next publish period, to save battery
+        //System.sleep((publishPeriod / 1000) - 5); // Put wifi to sleep until the next publish period, to save battery
     }
     
     delay(10);
@@ -85,7 +85,8 @@ void publishToParticle(float tempF, float humidityRH, float pressureKPa, float r
     Particle.publish("weather", 
                         String::format("%0.1f°F, %0.0f%%, %0.2f kPa, %0.2f in, Avg: %0.0fmph, Gust: %0.0fmph, Dir: %0.0f°, Battery: %0.0f%%.",
                             tempF, humidityRH, pressureKPa, rainInches, windMPH, gustMPH, windDegrees, stateOfCharge),
-                        60);    
+                        60);
+    Particle.process(); // Make sure we publish before sleeping
 }
 
 void publishToSerial(float tempF, float humidityRH, float pressureKPa, float rainInches, float windMPH, float gustMPH, float windDegrees, float stateOfCharge) {
