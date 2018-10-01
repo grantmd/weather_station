@@ -82,10 +82,12 @@ void loop() {
 }
 
 void publishToParticle(float tempF, float humidityRH, float pressureKPa, float rainInches, float windMPH, float gustMPH, float windDegrees, float stateOfCharge) {
-    Particle.publish("weather", 
-                        String::format("%0.1f°F, %0.0f%%, %0.2f kPa, %0.2f in, Avg: %0.0fmph, Gust: %0.0fmph, Dir: %0.0f°, Battery: %0.0f%%.",
-                            tempF, humidityRH, pressureKPa, rainInches, windMPH, gustMPH, windDegrees, stateOfCharge),
-                        60);
+
+    String data = String::format(
+        "{\"temp\":%f, \"wind_speed\":%f, \"wind_direction\":%f, \"rain\":%f, \"pressure\":%f, \"humidity\":%f, \"soc\":%f, \"status\":\"%s\", \"delta_t\":%d}",
+        tempF, windMPH, windDegrees, rainInches, pressureKPa, humidityRH, stateOfCharge, "online", (publishPeriod + (millis() - timeNextPublish)) / 1000);
+
+    Particle.publish("weather", data, PRIVATE);
     Particle.process(); // Make sure we publish before sleeping
 }
 
