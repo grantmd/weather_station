@@ -18,16 +18,23 @@ unsigned int timeNextPublish = 0;
 // Set system mode so we can control power consumption and network activity
 //SYSTEM_MODE(SEMI_AUTOMATIC);
 
+void handle_all_the_events(system_event_t event, int param) {
+    Serial.printlnf("got event %d with value %d", event, param);
+}
+
 void setup() {
     Serial.begin();
+    Serial.printlnf("System version: %s", System.version().c_str());
 
+    // TODO: Register events on wake/sleep/network etc?
+    System.on(all_events, handle_all_the_events);
+
+    // Turn on all the monitoring equipment
     initializeBatteryMonitor();
     initializeTempHumidityAndPressure();
     initializeRainGauge();
     initializeAnemometer();
     initializeWindVane();
-
-    // TODO: Register events on wake/sleep/network etc?
     
     // Schedule the next sensor reading and publish events
     timeNextSensorReading = millis() + sensorCapturePeriod;
