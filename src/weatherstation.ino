@@ -19,6 +19,7 @@ unsigned int timeNextPublish = 0;
 //SYSTEM_MODE(SEMI_AUTOMATIC);
 
 void handle_all_the_events(system_event_t event, int param) {
+    // TODO: Publish event cause why not? Might catch events we can't see on serial because we're plugged in
     Serial.printlnf("got event %d with value %d", event, param);
 }
 
@@ -35,6 +36,8 @@ void setup() {
     initializeRainGauge();
     initializeAnemometer();
     initializeWindVane();
+
+    // TODO: Schedule publish events based on realtime clock on the 15 minutes instead of on boot time
     
     // Schedule the next sensor reading and publish events
     timeNextSensorReading = millis() + sensorCapturePeriod;
