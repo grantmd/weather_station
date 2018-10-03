@@ -94,8 +94,8 @@ void loop() {
 void publishToParticle(float tempF, float humidityRH, float pressureKPa, float rainInches, float windMPH, float gustMPH, float windDegrees, float stateOfCharge) {
 
     String data = String::format(
-        "{\"temp\":%f, \"wind_speed\":%f, \"wind_direction\":%f, \"rain\":%f, \"pressure\":%f, \"humidity\":%f, \"soc\":%f, \"status\":\"%s\", \"delta_t\":%d}",
-        tempF, windMPH, windDegrees, rainInches, pressureKPa, humidityRH, stateOfCharge, "online", (publishPeriod + (millis() - timeNextPublish)) / 1000);
+        "{\"temp\":%f, \"wind_speed\":%f, \"wind_gust\":%f, \"wind_direction\":%f, \"rain\":%f, \"pressure\":%f, \"humidity\":%f, \"soc\":%f, \"status\":\"%s\", \"delta_t\":%d}",
+        tempF, windMPH, gustMPH, windDegrees, rainInches, pressureKPa, humidityRH, stateOfCharge, "online", (publishPeriod + (millis() - timeNextPublish)) / 1000);
 
     Particle.publish("weather", data, PRIVATE);
     Particle.process(); // Make sure we publish before sleeping
